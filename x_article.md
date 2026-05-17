@@ -2,7 +2,9 @@
 
 Five LLMs. Two tasks. Fifty calls. We measured what they actually cost, not what the price card says.
 
-Quick disclaimer up front: what follows is what *we* found on *our* prompts, in *one afternoon*, with *one judge*, on *five items per task*. Not the truth of the universe. Different prompts, different judge, different time of day could shift the rankings. The whole run is reproducible. If you run the scripts and get different numbers, that's a feature, please reply with what you saw.
+The code task is **medium-difficulty algorithmic problems** (think LeetCode medium: sliding window, prefix sum, BFS on a small grid, basic factorization). For *really* complex work (multi-file refactors, ambiguous specs, long-horizon agentic loops, deep math), the picture likely flips and frontier models earn their price. This post is about the 80% of code calls that aren't that.
+
+*Quick disclaimer:* what follows is what we found on our prompts, n=5/task, one judge, one afternoon. Reproducible end-to-end. If you run it and get different numbers, reply with the CSV.
 
 ---
 
