@@ -1,0 +1,635 @@
+task_file,item_id,model_id,model_name,prompt,output,input_tokens,output_tokens,latency_ms,retries,error,input_price,output_price
+task_a_code.json,A01,openai/gpt-5.5,GPT-5.5,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int]) -> int
+
+Problem: Return the length of the longest contiguous subarray whose elements are strictly increasing.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int]) -> int:
+    if not nums:
+        return 0
+
+    max_len = 1
+    current_len = 1
+
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i - 1]:
+            current_len += 1
+        else:
+            current_len = 1
+        max_len = max(max_len, current_len)
+
+    return max_len
+```",87,131,3319,0,,5.0,30.0
+task_a_code.json,A01,anthropic/claude-opus-4.7,Claude Opus 4.7,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int]) -> int
+
+Problem: Return the length of the longest contiguous subarray whose elements are strictly increasing.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int]) -> int:
+    if not nums:
+        return 0
+    max_len = 1
+    cur = 1
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i-1]:
+            cur += 1
+            max_len = max(max_len, cur)
+        else:
+            cur = 1
+    return max_len
+```",137,124,3278,0,,4.25,21.25
+task_a_code.json,A01,deepseek/deepseek-v4-pro,DeepSeek V4 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int]) -> int
+
+Problem: Return the length of the longest contiguous subarray whose elements are strictly increasing.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int]) -> int:
+    if not nums:
+        return 0
+
+    max_len = 1
+    cur_len = 1
+
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i - 1]:
+            cur_len += 1
+            if cur_len > max_len:
+                max_len = cur_len
+        else:
+            cur_len = 1
+
+    return max_len
+```",85,293,10951,0,,1.392,2.784
+task_a_code.json,A01,google/gemini-2-5-pro,Gemini 2.5 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int]) -> int
+
+Problem: Return the length of the longest contiguous subarray whose elements are strictly increasing.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int]) -> int:
+    """"""
+    Calculates the length of the longest contiguous subarray with strictly increasing elements.
+    """"""
+    if not nums:
+        return 0
+
+    max_length = 1
+    current_length = 1
+
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i - 1]:
+            current_length += 1
+        else:
+            current_length = 1
+        
+        if current_length > max_length:
+            max_length = current_length
+            
+    return max_length
+```",84,3754,27244,0,,1.25,10.0
+task_a_code.json,A01,openai/gpt-4o-mini,GPT-4o-mini,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int]) -> int
+
+Problem: Return the length of the longest contiguous subarray whose elements are strictly increasing.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int]) -> int:
+    if not nums:
+        return 0
+    
+    max_length = 1
+    current_length = 1
+    
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i - 1]:
+            current_length += 1
+        else:
+            max_length = max(max_length, current_length)
+            current_length = 1
+            
+    return max(max_length, current_length)
+```",88,98,2215,0,,0.15,0.6
+task_a_code.json,A02,openai/gpt-5.5,GPT-5.5,"Write a Python function named `solve` with this signature:
+
+def solve(s: str) -> str
+
+Problem: Given a string, return the longest substring containing at most 2 distinct characters.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(s: str) -> str:
+    left = 0
+    counts = {}
+    best_start = 0
+    best_len = 0
+
+    for right, ch in enumerate(s):
+        counts[ch] = counts.get(ch, 0) + 1
+
+        while len(counts) > 2:
+            left_ch = s[left]
+            counts[left_ch] -= 1
+            if counts[left_ch] == 0:
+                del counts[left_ch]
+            left += 1
+
+        current_len = right - left + 1
+        if current_len > best_len:
+            best_start = left
+            best_len = current_len
+
+    return s[best_start:best_start + best_len]
+```",87,214,5599,0,,5.0,30.0
+task_a_code.json,A02,anthropic/claude-opus-4.7,Claude Opus 4.7,"Write a Python function named `solve` with this signature:
+
+def solve(s: str) -> str
+
+Problem: Given a string, return the longest substring containing at most 2 distinct characters.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(s: str) -> str:
+    if not s:
+        return """"
+    left = 0
+    counts = {}
+    best_start = 0
+    best_len = 0
+    for right, ch in enumerate(s):
+        counts[ch] = counts.get(ch, 0) + 1
+        while len(counts) > 2:
+            counts[s[left]] -= 1
+            if counts[s[left]] == 0:
+                del counts[s[left]]
+            left += 1
+        if right - left + 1 > best_len:
+            best_len = right - left + 1
+            best_start = left
+    return s[best_start:best_start + best_len]
+```",130,209,3526,0,,4.25,21.25
+task_a_code.json,A02,deepseek/deepseek-v4-pro,DeepSeek V4 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(s: str) -> str
+
+Problem: Given a string, return the longest substring containing at most 2 distinct characters.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(s: str) -> str:
+    if not s:
+        return """"
+    n = len(s)
+    if n <= 2:
+        return s
+    left = 0
+    max_len = 0
+    start = 0
+    char_count = {}
+    for right in range(n):
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+        while len(char_count) > 2:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]
+            left += 1
+        current_len = right - left + 1
+        if current_len > max_len:
+            max_len = current_len
+            start = left
+    return s[start:start+max_len]
+```",85,683,16153,0,,1.392,2.784
+task_a_code.json,A02,google/gemini-2-5-pro,Gemini 2.5 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(s: str) -> str
+
+Problem: Given a string, return the longest substring containing at most 2 distinct characters.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(s: str) -> str:
+    """"""
+    Given a string, return the longest substring containing at most 2 distinct characters.
+    """"""
+    if len(s) <= 2:
+        return s
+
+    left = 0
+    max_len = 0
+    start_index = 0
+    window_chars = {}
+
+    for right, char in enumerate(s):
+        # Add the current character to the window
+        window_chars[char] = window_chars.get(char, 0) + 1
+
+        # If the window contains more than 2 distinct characters, shrink it from the left
+        while len(window_chars) > 2:
+            ",84,4092,29099,0,,1.25,10.0
+task_a_code.json,A02,openai/gpt-4o-mini,GPT-4o-mini,"Write a Python function named `solve` with this signature:
+
+def solve(s: str) -> str
+
+Problem: Given a string, return the longest substring containing at most 2 distinct characters.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(s: str) -> str:
+    left = 0
+    right = 0
+    char_count = {}
+    max_length = 0
+    start_index = 0
+
+    while right < len(s):
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+        
+        while len(char_count) > 2:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]
+            left += 1
+        
+        if right - left + 1 > max_length:
+            max_length = right - left + 1
+            start_index = left
+        
+        right += 1
+    
+    return s[start_index:start_index + max_length]
+```",88,162,2137,0,,0.15,0.6
+task_a_code.json,A03,openai/gpt-5.5,GPT-5.5,"Write a Python function named `solve` with this signature:
+
+def solve(n: int) -> list[int]
+
+Problem: Return all integers from 1 to n (inclusive) that are NOT divisible by any prime greater than 5. Order ascending.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(n: int) -> list[int]:
+    res = []
+    p2 = 1
+    while p2 <= n:
+        p3 = p2
+        while p3 <= n:
+            p5 = p3
+            while p5 <= n:
+                res.append(p5)
+                p5 *= 5
+            p3 *= 3
+        p2 *= 2
+    return sorted(res)
+```",98,402,10309,0,,5.0,30.0
+task_a_code.json,A03,anthropic/claude-opus-4.7,Claude Opus 4.7,"Write a Python function named `solve` with this signature:
+
+def solve(n: int) -> list[int]
+
+Problem: Return all integers from 1 to n (inclusive) that are NOT divisible by any prime greater than 5. Order ascending.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(n: int) -> list[int]:
+    result = []
+    for i in range(1, n + 1):
+        x = i
+        for p in (2, 3, 5):
+            while x % p == 0:
+                x //= p
+        if x == 1:
+            result.append(i)
+    return result
+```",150,99,6048,0,,4.25,21.25
+task_a_code.json,A03,deepseek/deepseek-v4-pro,DeepSeek V4 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(n: int) -> list[int]
+
+Problem: Return all integers from 1 to n (inclusive) that are NOT divisible by any prime greater than 5. Order ascending.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(n: int) -> list[int]:
+    if n < 1:
+        return []
+    nums = [1]
+    i2 = i3 = i5 = 0
+    while True:
+        next2 = nums[i2] * 2
+        next3 = nums[i3] * 3
+        next5 = nums[i5] * 5
+        next_num = min(next2, next3, next5)
+        if next_num > n:
+            break
+        nums.append(next_num)
+        if next_num == next2:
+            i2 += 1
+        if next_num == next3:
+            i3 += 1
+        if next_num == next5:
+            i5 += 1
+    return nums
+```",97,1008,14925,0,,1.392,2.784
+task_a_code.json,A03,google/gemini-2-5-pro,Gemini 2.5 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(n: int) -> list[int]
+
+Problem: Return all integers from 1 to n (inclusive) that are NOT divisible by any prime greater than 5. Order ascending.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(n: int) -> list[int]:
+    """"""
+    Returns all integers from 1 to n (inclusive) that are NOT divisible
+    by any prime greater than 5.
+    """"""
+    result = []
+    for i in range(1, n + 1):
+        num = i
+        # A number is not divisible by any prime greater than 5 if its prime
+        # factorization consists only of 2, 3, and 5.
+        # We can check this by repeatedly dividing the number by 2, 3, and 5
+        # until it's no longer divisible. If the remaining number is 1,
+        # then it satisfies the condition.
+        for prime in [",97,4092,29428,0,,1.25,10.0
+task_a_code.json,A03,openai/gpt-4o-mini,GPT-4o-mini,"Write a Python function named `solve` with this signature:
+
+def solve(n: int) -> list[int]
+
+Problem: Return all integers from 1 to n (inclusive) that are NOT divisible by any prime greater than 5. Order ascending.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(n: int) -> list[int]:
+    def is_prime(num):
+        if num < 2:
+            return False
+        for i in range(2, int(num**0.5) + 1):
+            if num % i == 0:
+                return False
+        return True
+
+    primes = [p for p in range(7, n + 1) if is_prime(p)]
+    result = []
+
+    for i in range(1, n + 1):
+        if all(i % p != 0 for p in primes):
+            result.append(i)
+
+    return result
+```",99,130,1990,0,,0.15,0.6
+task_a_code.json,A04,openai/gpt-5.5,GPT-5.5,"Write a Python function named `solve` with this signature:
+
+def solve(grid: list[list[int]]) -> int
+
+Problem: Given a 2D grid of 0s and 1s, return the number of connected groups of 1s (4-directional connectivity).
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(grid: list[list[int]]) -> int:
+    if not grid or not grid[0]:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 1:
+                count += 1
+                stack = [(r, c)]
+                grid[r][c] = 0
+
+                while stack:
+                    x, y = stack.pop()
+                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == 1:
+                            grid[nx][ny] = 0
+                            stack.append((nx, ny))
+
+    return count
+```",104,243,4677,0,,5.0,30.0
+task_a_code.json,A04,anthropic/claude-opus-4.7,Claude Opus 4.7,"Write a Python function named `solve` with this signature:
+
+def solve(grid: list[list[int]]) -> int
+
+Problem: Given a 2D grid of 0s and 1s, return the number of connected groups of 1s (4-directional connectivity).
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(grid: list[list[int]]) -> int:
+    if not grid or not grid[0]:
+        return 0
+    rows, cols = len(grid), len(grid[0])
+    visited = [[False] * cols for _ in range(rows)]
+    count = 0
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 1 and not visited[i][j]:
+                count += 1
+                stack = [(i, j)]
+                visited[i][j] = True
+                while stack:
+                    x, y = stack.pop()
+                    for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < rows and 0 <= ny < cols and not visited[nx][ny] and grid[nx][ny] == 1:
+                            visited[nx][ny] = True
+                            stack.append((nx, ny))
+    return count
+```",152,325,3993,0,,4.25,21.25
+task_a_code.json,A04,deepseek/deepseek-v4-pro,DeepSeek V4 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(grid: list[list[int]]) -> int
+
+Problem: Given a 2D grid of 0s and 1s, return the number of connected groups of 1s (4-directional connectivity).
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(grid: list[list[int]]) -> int:
+    if not grid:
+        return 0
+    rows = len(grid)
+    cols = len(grid[0])
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == 1:
+                count += 1
+                stack = [(r, c)]
+                grid[r][c] = 0
+                while stack:
+                    x, y = stack.pop()
+                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == 1:
+                            grid[nx][ny] = 0
+                            stack.append((nx, ny))
+    return count
+```",103,1304,96285,0,,1.392,2.784
+task_a_code.json,A04,google/gemini-2-5-pro,Gemini 2.5 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(grid: list[list[int]]) -> int
+
+Problem: Given a 2D grid of 0s and 1s, return the number of connected groups of 1s (4-directional connectivity).
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(grid: list[list[int]]) -> int:
+    """"""
+    Given a 2D grid of 0s and 1s, return the number of connected groups of 1s
+    (4-directional connectivity).
+    """"""
+    if not grid or not grid[0]:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    count = 0
+
+    def dfs(r, c):
+        """"""A helper function to perform Depth-First Search.""""""
+        # Check for boundary conditions or if the cell is not part of an island
+        if r < 0 or c < 0 or r >= rows or c >= cols or grid[r][c] == 0:
+            return
+
+        # Mark the cell as visited by changing its value to 0
+        grid[r][c] = 0
+
+        # Explore all 4 directions
+        dfs(r + 1, c)  # Down
+        dfs(r - 1, c)  # Up
+        dfs(r, c + 1)  # Right
+        dfs(r, c - 1)  # Left
+
+    # Iterate through each cell in the grid
+    for r in range(rows):
+        for c in range(cols):
+            # If a cell contains a '1', it's the start of a new island
+            if grid[r][c] == 1:
+                count += 1
+                # Use DFS to find and ""sink"" all parts of this island
+                dfs(r, c)
+
+    return count
+```",103,3135,25238,0,,1.25,10.0
+task_a_code.json,A04,openai/gpt-4o-mini,GPT-4o-mini,"Write a Python function named `solve` with this signature:
+
+def solve(grid: list[list[int]]) -> int
+
+Problem: Given a 2D grid of 0s and 1s, return the number of connected groups of 1s (4-directional connectivity).
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(grid: list[list[int]]) -> int:
+    if not grid:
+        return 0
+
+    rows, cols = len(grid), len(grid[0])
+    visited = [[False] * cols for _ in range(rows)]
+
+    def dfs(r, c):
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] == 0 or visited[r][c]:
+            return
+        visited[r][c] = True
+        dfs(r + 1, c)
+        dfs(r - 1, c)
+        dfs(r, c + 1)
+        dfs(r, c - 1)
+
+    count = 0
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i][j] == 1 and not visited[i][j]:
+                dfs(i, j)
+                count += 1
+
+    return count
+```",105,194,4395,0,,0.15,0.6
+task_a_code.json,A05,openai/gpt-5.5,GPT-5.5,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int], k: int) -> int
+
+Problem: Return the number of subarrays whose sum equals k.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int], k: int) -> int:
+    count = 0
+    prefix_sum = 0
+    seen = {0: 1}
+
+    for num in nums:
+        prefix_sum += num
+        count += seen.get(prefix_sum - k, 0)
+        seen[prefix_sum] = seen.get(prefix_sum, 0) + 1
+
+    return count
+```",87,139,3795,0,,5.0,30.0
+task_a_code.json,A05,anthropic/claude-opus-4.7,Claude Opus 4.7,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int], k: int) -> int
+
+Problem: Return the number of subarrays whose sum equals k.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int], k: int) -> int:
+    from collections import defaultdict
+    count = 0
+    prefix = 0
+    sums = defaultdict(int)
+    sums[0] = 1
+    for n in nums:
+        prefix += n
+        count += sums[prefix - k]
+        sums[prefix] += 1
+    return count
+```",130,121,2684,0,,4.25,21.25
+task_a_code.json,A05,deepseek/deepseek-v4-pro,DeepSeek V4 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int], k: int) -> int
+
+Problem: Return the number of subarrays whose sum equals k.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int], k: int) -> int:
+    count = 0
+    prefix_sum = 0
+    prefix_counts = {0: 1}
+    
+    for num in nums:
+        prefix_sum += num
+        if prefix_sum - k in prefix_counts:
+            count += prefix_counts[prefix_sum - k]
+        prefix_counts[prefix_sum] = prefix_counts.get(prefix_sum, 0) + 1
+    
+    return count
+```",85,102,3712,0,,1.392,2.784
+task_a_code.json,A05,google/gemini-2-5-pro,Gemini 2.5 Pro,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int], k: int) -> int
+
+Problem: Return the number of subarrays whose sum equals k.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int], k: int) -> int:
+    """"""
+    Calculates the number of subarrays in `nums` whose sum equals `k`.
+
+    This function uses a hash map to store the cumulative sum frequencies.
+    It iterates through the array, calculating the prefix sum at each step.
+    For each prefix sum `current_sum`, it checks if `current_sum - k`
+    exists in the map. If it does, it means there are subarrays ending at the
+    current position whose sum is `k`. The count of such subarrays is the
+    frequency of the prefix sum `current_sum - k`.
+
+    The time complexity is O(n) because we iterate through the list once.",84,4092,28825,0,,1.25,10.0
+task_a_code.json,A05,openai/gpt-4o-mini,GPT-4o-mini,"Write a Python function named `solve` with this signature:
+
+def solve(nums: list[int], k: int) -> int
+
+Problem: Return the number of subarrays whose sum equals k.
+
+Return ONLY the complete function (starting with the `def solve(...)` line) inside a single Python code block. No explanation. Do not include `if __name__ == ...` blocks or example calls.","```python
+def solve(nums: list[int], k: int) -> int:
+    count = 0
+    cumulative_sum = 0
+    sum_count = {0: 1}
+    
+    for num in nums:
+        cumulative_sum += num
+        if cumulative_sum - k in sum_count:
+            count += sum_count[cumulative_sum - k]
+        sum_count[cumulative_sum] = sum_count.get(cumulative_sum, 0) + 1
+    
+    return count
+```",88,102,1452,0,,0.15,0.6

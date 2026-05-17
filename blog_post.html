@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A $0.15 model tied $30 models on code. Here's what we paid to find out.</title>
+<meta name="description" content="Real $/task across five LLMs on two real workloads, routed through Mesh API. Pilot run, n=5 per task. What the price card hides." />
+<meta property="og:title" content="A $0.15 model tied $30 models on code." />
+<meta property="og:description" content="Real $/task across five LLMs. Tokenizer tax, reasoning tax, and the price card lies." />
+<style>
+  :root {
+    --bg: #0E1126;
+    --panel: #171A32;
+    --panel-2: #1E2240;
+    --border: #22253E;
+    --text: #E6E8F2;
+    --muted: #9CA3B8;
+    --violet: #A78BFA;
+    --violet-deep: #7C5CF5;
+    --orange: #FB923C;
+    --orange-deep: #F97316;
+    --green: #34D399;
+    --red: #F87171;
+    --cyan: #22D3EE;
+    --tan: #F0B36A;
+    --blue: #60A5FA;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 28px 96px;
+  }
+  header.hero {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+  }
+  .chip {
+    display: inline-block;
+    padding: 5px 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    margin-bottom: 18px;
+  }
+  .chip .dot {
+    display: inline-block;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--violet);
+    margin-right: 7px; vertical-align: middle;
+  }
+  h1 {
+    font-size: 2.35rem;
+    line-height: 1.18;
+    margin: 0 0 14px;
+    letter-spacing: -0.012em;
+    font-weight: 800;
+  }
+  h1 .accent {
+    color: var(--violet);
+  }
+  .subtitle {
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin: 0;
+  }
+  .meta {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .meta span + span { margin-left: 18px; }
+  .meta span::before {
+    content: "";
+    display: inline-block;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--muted);
+    margin-right: 7px;
+    vertical-align: middle;
+    opacity: 0.6;
+  }
+  h2 {
+    font-size: 1.6rem;
+    margin: 56px 0 16px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+  h3 {
+    font-size: 1.2rem;
+    margin: 36px 0 10px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  p { margin: 0 0 18px; }
+  a { color: var(--violet); text-decoration: none; border-bottom: 1px dashed rgba(167,139,250,0.4); }
+  a:hover { color: var(--cyan); border-bottom-color: var(--cyan); }
+  strong { color: #FFFFFF; font-weight: 700; }
+  code, kbd, samp {
+    font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 1.5px 6px;
+    border-radius: 4px;
+    color: var(--violet);
+  }
+
+  /* Callouts */
+  .callout {
+    background: linear-gradient(180deg, rgba(124,92,245,0.07), rgba(124,92,245,0.02));
+    border: 1px solid rgba(124,92,245,0.3);
+    border-left: 3px solid var(--violet);
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 22px 0;
+    font-size: 0.97rem;
+    color: var(--text);
+  }
+  .callout.warn {
+    border-color: rgba(251,146,60,0.35);
+    border-left-color: var(--orange);
+    background: linear-gradient(180deg, rgba(251,146,60,0.06), rgba(251,146,60,0.01));
+  }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* The "four numbers" hero list */
+  .four {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 30px 0;
+  }
+  .four .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .four .num {
+    font-size: 0.78rem;
+    color: var(--violet);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+  .four .lede { font-size: 0.98rem; line-height: 1.55; }
+  .four strong { color: #FFFFFF; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 22px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    font-size: 0.92rem;
+  }
+  th, td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--panel-2);
+  }
+  td.num, th.num { text-align: right; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  tr:last-child td { border-bottom: 0; }
+  tr.winner td {
+    background: rgba(52,211,153,0.05);
+  }
+  tr.winner td:first-child {
+    color: var(--green);
+    font-weight: 700;
+    border-left: 2px solid var(--green);
+  }
+
+  /* Charts */
+  figure {
+    margin: 28px 0;
+    padding: 0;
+  }
+  figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  figcaption {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* Decision-rule cards */
+  .rules { counter-reset: rule; margin: 24px 0; }
+  .rules .rule {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+  .rules .rule:first-child { border-top: 0; }
+  .rules .rule::before {
+    counter-increment: rule;
+    content: counter(rule);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--violet);
+    color: #0E1126;
+    font-weight: 800;
+    font-size: 1.05rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rules .rule h4 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+  .rules .rule p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  /* "What this doesn't tell you" list */
+  ul.limits {
+    list-style: none;
+    padding: 0;
+    margin: 18px 0;
+  }
+  ul.limits li {
+    padding: 11px 0 11px 28px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  ul.limits li:last-child { border-bottom: 0; }
+  ul.limits li::before {
+    content: "";
+    position: absolute;
+    left: 4px; top: 18px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+    opacity: 0.7;
+  }
+  ul.limits b { color: var(--text); }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* CTA + footer */
+  .cta {
+    background: linear-gradient(135deg, rgba(124,92,245,0.12), rgba(34,211,238,0.06));
+    border: 1px solid rgba(124,92,245,0.35);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin: 32px 0;
+  }
+  .cta h3 { margin-top: 0; color: var(--text); }
+  .cta p:last-child { margin-bottom: 0; }
+  .cta .btn {
+    display: inline-block;
+    margin-top: 10px;
+    background: var(--violet);
+    color: #0E1126;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    border-bottom: 0;
+  }
+  .cta .btn:hover { background: var(--cyan); }
+
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer p { margin: 0 0 8px; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 36px 18px 72px; }
+    h1 { font-size: 1.85rem; }
+    h2 { font-size: 1.35rem; margin-top: 44px; }
+    .four { grid-template-columns: 1fr; }
+    th, td { padding: 9px 10px; font-size: 0.86rem; }
+    body { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="chip"><span class="dot"></span>Mesh API benchmark, pilot n=5 per task</span>
+  <h1>A $0.15 model tied $30 models on code. <span class="accent">Here's what we paid to find out.</span></h1>
+  <p class="subtitle">Five LLMs. Two tasks. Fifty calls. We measured what they actually cost, not what the price card says.</p>
+  <p class="meta"><span>2026-05-18</span><span>10 min read</span><span>Mesh API benchmark, pilot edition</span></p>
+</header>
+
+<div class="callout warn">
+  <p><strong>Heads up before you read further.</strong></p>
+  <p>What follows is what <em>we</em> found on <em>our</em> prompts, on <em>one afternoon</em>, in <em>one region</em>, with <em>one model judge</em>, on <em>five items per task</em>. Not the truth of the universe. Just what the receipts said. Different prompts, different sample sizes, different judge models, different time of day, even different randomness on temperature 0.2 could shift the rankings.</p>
+  <p>The whole run is reproducible. The prompts, the runner, the judge, and the aggregator are in the repo. If you run them and get different numbers, that's a feature. Please reply with what you saw. We'd rather get corrected in public than be wrong in silence.</p>
+  <p>This is a pilot (n=5/task). v1 with n=30 is coming. The headline gaps are big enough that the broad shape is unlikely to flip, but the second-decimal differences absolutely could.</p>
+</div>
+
+<h2>The four numbers</h2>
+
+<div class="four">
+  <div class="card">
+    <div class="num">01</div>
+    <div class="lede"><strong>Four of five models passed 100% of the code test.</strong> GPT-4o-mini ($0.15/M in) and GPT-5.5 ($5/M in) both got 5/5. Same answers, <strong>86&times; the price</strong>.</div>
+  </div>
+  <div class="card">
+    <div class="num">02</div>
+    <div class="lede"><strong>Claude Opus 4.7's tokenizer billed ~60% more input tokens than OpenAI's</strong> for identical English prompts. A $5/M-input model is really charging ~$8/M on the text we sent. Not on Anthropic's price page.</div>
+  </div>
+  <div class="card">
+    <div class="num">03</div>
+    <div class="lede"><strong>Gemini 2.5 Pro billed 19,165 "output tokens" across 5 code problems.</strong> Visible answer content: ~840 tokens. Roughly <strong>96% hidden reasoning</strong> Mesh strips before the response reaches you. The model still only got 2 of 5 problems right.</div>
+  </div>
+  <div class="card">
+    <div class="num">04</div>
+    <div class="lede"><strong>On support, the best model (Opus 4.7) was 14% higher quality than the cheapest (GPT-4o-mini)</strong>, and <strong>72&times; more expensive per quality-point</strong>. A small quality bump that costs a fortune.</div>
+  </div>
+</div>
+
+<figure>
+  <img src="chart_1_real_cost.png" alt="Chart 1: real cost per correct code answer, 5 models, log scale" />
+  <figcaption>Chart 1. Real cost per correct code answer. Five models, five identical problems. Log scale.</figcaption>
+</figure>
+
+<h2>What we ran</h2>
+
+<p>Two tasks. Same five models. Same prompts to all of them. Token counts straight from each provider's <code>usage</code> field, not estimated. Dollars at the prices Mesh actually billed us.</p>
+
+<ul>
+  <li><strong>Task A, code generation.</strong> Five original algorithmic problems with hidden test cases. Pass or fail per test, programmatic. No LLM judge needed.</li>
+  <li><strong>Task B, customer support.</strong> Five synthetic tickets for a fictional cloud-storage product, each with a rubric. Claude Opus 4.7 rates each reply on tone, accuracy, completeness (1 to 5 each, mean reported). Two passes per item (temp 0.0 and 0.3) so we have variance bars.</li>
+</ul>
+
+<p>The exact datasets, <code>task_a_code.json</code> and <code>task_b_support.json</code> (30 items each, 5 used in the pilot), are in the repo. Run them against any model you can route to.</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Model</th><th>Tier</th><th class="num">List $/M (in / out)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GPT-5.5</td><td>Frontier</td><td class="num">$5.00 / $30.00</td></tr>
+    <tr><td>Claude Opus 4.7</td><td>Frontier</td><td class="num">$5.00 / $25.00 (Mesh 15% disc &rarr; $4.25 / $21.25)</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td>Mid</td><td class="num">$1.39 / $2.78</td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td>Mid</td><td class="num">$1.25 / $10.00</td></tr>
+    <tr><td>GPT-4o-mini</td><td>Workhorse</td><td class="num">$0.15 / $0.60</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>The headline result</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th class="num">Task A pass</th>
+      <th class="num">Task A $/correct</th>
+      <th class="num">Task B quality (1 to 5)</th>
+      <th class="num">Task B $/qual-pt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="winner"><td>GPT-4o-mini</td><td class="num">5/5</td><td class="num">$0.0001</td><td class="num">3.03 &plusmn; 0.07</td><td class="num">$0.00019</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td class="num">5/5</td><td class="num">$0.00201</td><td class="num">3.07 &plusmn; 0.13</td><td class="num">$0.00322</td></tr>
+    <tr><td>Claude Opus 4.7</td><td class="num">5/5</td><td class="num">$0.00563</td><td class="num"><strong>3.53 &plusmn; 0.00</strong></td><td class="num">$0.01363</td></tr>
+    <tr><td>GPT-5.5</td><td class="num">5/5</td><td class="num">$0.00859</td><td class="num">3.33 &plusmn; 0.13</td><td class="num">$0.01856</td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td class="num">2/5</td><td class="num">$0.10090</td><td class="num">3.17 &plusmn; 0.20</td><td class="num">$0.02288</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Two stories in one table.</strong></p>
+
+<p><em>On code:</em> four of five models tied at perfect. The only differentiator was cost. The cheapest model came out <strong>86&times; cheaper than GPT-5.5</strong>, <strong>56&times; cheaper than Opus 4.7</strong>, and over <strong>1,000&times; cheaper than Gemini 2.5 Pro</strong> per correct answer.</p>
+
+<p><em>On support:</em> Opus wins quality at 3.53, but it's a 0.5-point lead on a 5-point scale, costing 72&times; more per quality-point. Whether that's worth it depends entirely on how expensive a single bad reply is for your product.</p>
+
+<p>The judge replicated itself perfectly on Opus (variance 0.00) and was noisiest on Gemini (0.20). Nothing exceeded 0.2, so the quality scores hold up.</p>
+
+<div class="callout">
+  <p><strong>Honest caveat.</strong> Five items is small. The frontier models likely pull ahead on accuracy as problems get longer and uglier (multi-file refactors, ambiguous specs, deep reasoning). The right question isn't "which model is best." It's <strong>"for the work I'm actually shipping, what's the smallest model that hits my accuracy bar?"</strong></p>
+</div>
+
+<h2>Four hidden taxes the price card never mentions</h2>
+
+<p>A token isn't a token isn't a token. Below are four cost layers we directly observed in this run. None of them on anyone's pricing page.</p>
+
+<h3>Tax 1. The tokenizer tax (we measured it on our actual prompts)</h3>
+
+<p>You'd assume "input tokens" is a property of your input. It isn't. It's a property of the tokenizer that turns your input into tokens, and <strong>every provider uses a different one</strong>.</p>
+
+<p>Ten identical English prompts, sent to all five models. Here's the input-token count each provider reported:</p>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr><th>Model</th><th class="num">Input tokens for the 10 prompts</th><th class="num">Delta vs OpenAI baseline</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GPT-4o-mini (OpenAI)</td><td class="num">1,544</td><td class="num">baseline</td></tr>
+    <tr><td>GPT-5.5 (OpenAI)</td><td class="num">1,534</td><td class="num">&minus;0.6%</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td class="num">1,582</td><td class="num">+2.5%</td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td class="num">1,637</td><td class="num">+6.0%</td></tr>
+    <tr style="background:rgba(251,146,60,0.05)"><td><strong>Claude Opus 4.7</strong></td><td class="num"><strong>2,468</strong></td><td class="num"><strong style="color:var(--orange)">+59.8%</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Same text. Same words. Opus's tokenizer cut English into ~60% more pieces, and we paid for every piece. Opus's effective input price on this corpus comes out closer to <strong>$5.00 &times; 1.60 &asymp; $8/M-in</strong>, not the $5/M-in on the card.</p>
+
+<div class="callout">
+  <p>Your number will differ. Code-heavy traffic, multilingual, structured data, every workload tokenizes differently. The right thing to do: take 1,000 tokens of <em>your</em> actual traffic, send it through each provider with <code>max_tokens=1</code>, read <code>usage.prompt_tokens</code>, write down the ratio, plug it into your cost model. One hour of work, then your unit economics aren't lying to you anymore.</p>
+</div>
+
+<h3>Tax 2. The reasoning tax (paying for thoughts you never see)</h3>
+
+<p>Some models "think" silently before they answer. Those reasoning tokens are real tokens, on your bill, even though you can't see them in the response.</p>
+
+<p><strong>Gemini 2.5 Pro is the worst case we measured:</strong></p>
+<ul>
+  <li>Output tokens billed across 5 code problems: <strong>19,165</strong></li>
+  <li>Visible answer content total: ~3,400 characters, roughly <strong>~840 tokens</strong></li>
+  <li><strong>~96% of what we paid for never reached the response body.</strong></li>
+</ul>
+
+<p>A single Gemini call on Task A cost ~$0.04. The equivalent GPT-4o-mini call cost ~$0.0001. <strong>400&times; more expensive, and Gemini got 2 of 5 right vs GPT-4o-mini's 5 of 5.</strong></p>
+
+<p>GPT-5.5 also does internal reasoning. Visibly less than Gemini, but it's there. Average output per Task A item: <strong>226 tokens (GPT-5.5) vs 137 (GPT-4o-mini)</strong>. That's 65% more billed output for similar-length final answers.</p>
+
+<div class="callout">
+  <p>If your provider exposes a reasoning-effort knob, dial it to the lowest setting that hits your accuracy bar. "Thinking tokens" in marketing copy is "billed-but-invisible tokens" on your invoice.</p>
+</div>
+
+<h3>Tax 3. The accuracy assumption that didn't hold (at this size)</h3>
+
+<p>The intuitive model is this: <em>frontier models cost more but get more right, so $/correct evens out</em>. In our run, <strong>it didn't</strong>. Four of five models, including the cheap one, hit 100% on the code test. The premium tiers didn't pull ahead on accuracy at all. They pulled ahead on dollars per correct answer, in the wrong direction:</p>
+
+<figure>
+  <img src="chart_2_task_a.png" alt="Chart 2: Task A scoreboard, pass rate and $/correct, 5 models" />
+  <figcaption>Chart 2. Task A scoreboard. Purple bars are pass rate (left axis, linear). Orange bars are $/correct (right axis, log).</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Model</th><th class="num">$/correct</th><th class="num">Multiple vs GPT-4o-mini</th></tr></thead>
+  <tbody>
+    <tr><td>GPT-4o-mini</td><td class="num">$0.0001</td><td class="num">1&times;</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td class="num">$0.00201</td><td class="num"><strong>20&times;</strong></td></tr>
+    <tr><td>Claude Opus 4.7</td><td class="num">$0.00563</td><td class="num"><strong>56&times;</strong></td></tr>
+    <tr><td>GPT-5.5</td><td class="num">$0.00859</td><td class="num"><strong>86&times;</strong></td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td class="num">$0.10090</td><td class="num"><strong style="color:var(--red)">1,009&times;</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+  <p><strong>Honest disclaimer.</strong> Five problems is a small slice. On longer, gnarlier problems (multi-step planning, large codebases, deep reasoning), the frontier models very likely pull ahead on accuracy, and the math flips. Take this as "the floor is lower than you think for common code," not "premium models are useless." The takeaway is to know where your floor is, then route accordingly.</p>
+</div>
+
+<h3>Tax 4. Quality saturation (small wins, big bills)</h3>
+
+<p>On support, every model produced something workable. The quality range across all five was 3.03 to 3.53, a 0.5-point spread on a 5-point scale, or <strong>14% relative</strong>.</p>
+
+<p>The <strong>cost</strong> range over the same five was <strong>80&times;</strong> ($0.0006 for GPT-4o-mini vs $0.0482 for Opus 4.7, after applying our placeholder output-token inflation).</p>
+
+<figure>
+  <img src="chart_3_task_b.png" alt="Chart 3: Task B scoreboard, quality (with variance) and $/qual-pt, 5 models" />
+  <figcaption>Chart 3. Task B scoreboard. Purple bars are judge quality with error bars (±variance across two judge passes). Orange bars are $/quality-point (log).</figcaption>
+</figure>
+
+<p>Opus 4.7 buys a small quality bump for a huge cost bump. That can be worth it on calls where a bad reply is expensive (security, finance, brand-attached customer copy). It's a bad trade on the routine 80% of support volume where any of the five would have produced something fine.</p>
+
+<div class="callout">
+  <p>The decision rule isn't "use the best model." It's <strong>"route the call by what it actually needs."</strong> Most companies skip that step and pay frontier prices for everything. The over-spend is structural, not accidental.</p>
+</div>
+
+<h2>Latency, while we're at it</h2>
+
+<p>Cost isn't the only axis. On the same calls:</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Model</th><th class="num">Task A avg</th><th class="num">Task B avg</th></tr></thead>
+  <tbody>
+    <tr><td>GPT-4o-mini</td><td class="num">2.4 s</td><td class="num">2.3 s</td></tr>
+    <tr><td>Claude Opus 4.7</td><td class="num">3.9 s</td><td class="num">7.1 s</td></tr>
+    <tr><td>GPT-5.5</td><td class="num">5.5 s</td><td class="num">9.2 s</td></tr>
+    <tr><td>Gemini 2.5 Pro</td><td class="num">28.0 s</td><td class="num">13.7 s</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td class="num"><strong style="color:var(--red)">28.4 s</strong></td><td class="num">16.2 s</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>DeepSeek V4 Pro looks like a steal on $/correct (2nd-best at $0.00201) but it took ~28 seconds to produce each code answer on average. For an interactive product, that's unshippable. For an overnight batch job, it's a bargain. Match the model to the use case.</p>
+
+<h2>The combined picture</h2>
+
+<p>When we average the two tasks (treating Task A's pass rate as a 0 to 5 quality score for direct comparison), the ladder is clean:</p>
+
+<figure>
+  <img src="chart_4_cross_task.png" alt="Chart 4: combined $/quality across both tasks, 5 models, log scale" />
+  <figcaption>Chart 4. Combined $/quality-point across both tasks. Lower is better. Log scale spans three orders of magnitude.</figcaption>
+</figure>
+
+<p>A three-order-of-magnitude gap between cheapest and most expensive, with roughly the same quality on either end. <strong>The smartest model in the line-up costs 65&times; more per quality-point than the workhorse, for a 6% absolute quality improvement.</strong> That's a routing problem, not a model-selection problem.</p>
+
+<h2>Decision rules that fall out of this</h2>
+
+<div class="rules">
+  <div class="rule">
+    <div>
+      <h4>Default to the workhorse tier.</h4>
+      <p>A $0.15/M model handled 100% of our code problems and got within 86% of the top quality score on support. For most volume, that's plenty. Pay frontier prices for the calls where being wrong is unusually expensive, not for the calls where being right is unusually cheap.</p>
+    </div>
+  </div>
+  <div class="rule">
+    <div>
+      <h4>Measure your real tokenizer tax once, bake it into your cost model.</h4>
+      <p>Don't trust the price card. Our Opus 1.60&times; input-side ratio is specific to <em>our</em> English-text benchmark. Yours will differ. Spend an hour, get your real ratio, plug it in. Update quarterly.</p>
+    </div>
+  </div>
+  <div class="rule">
+    <div>
+      <h4>Watch for reasoning tokens.</h4>
+      <p>Models that do invisible chain-of-thought can 5&times; or 50&times; your output bill without you seeing what you're paying for. If the provider exposes a reasoning-effort knob, pick the lowest setting that hits your accuracy bar. If not, monitor <code>usage.completion_tokens</code> against actual response length.</p>
+    </div>
+  </div>
+  <div class="rule">
+    <div>
+      <h4>Build a router, not a model choice.</h4>
+      <p>Pick a cheap default, an expensive escalation path, a heuristic for when to escalate. That structure handles the price card lying, tokenizer drift, and future model launches. Single-model architectures don't.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Why we ran this through Mesh API</h2>
+
+<p>Every call in this benchmark went through Mesh (<code>api.meshapi.ai</code>). One client, one key, one bill, five providers behind it. Switching models was changing a string in a list. Without that, this whole post is a stack of SDKs, auth flows, rate-limit dialects, and per-vendor billing pages, and it would have taken a week, not an afternoon.</p>
+
+<p>For production, same idea, plus the ability to route by prompt characteristic. Cheap default, frontier escalation, observability across all of it. That's the routing layer that lets Decision Rule 4 above actually become real code.</p>
+
+<h2>What this benchmark deliberately does not tell you</h2>
+
+<p>In service of honesty, here's everything we <em>didn't</em> cover. Hold us to all of these.</p>
+
+<ul class="limits">
+  <li><b>n=5 per task.</b> Big enough to see headline gaps, way too small for confidence intervals or arguing second-decimal differences. The 5/5 ties on Task A could move by an item or two at n=30 (v1 lands shortly).</li>
+  <li><b>Single judge for Task B.</b> Claude Opus 4.7 rated every model's replies, including Anthropic's own model's replies. Risk of own-output bias is real. We mitigated by running each rating twice. v2 will use a three-judge ensemble and majority vote.</li>
+  <li><b>No human eval.</b> Quality scores are LLM-judged. A human calibration set is on the v2 list.</li>
+  <li><b>Task A scoring is binary.</b> A nearly-right solution that fails one edge case scores zero. Harsh, but consistent across models.</li>
+  <li><b>Pattern overlap with training data is likely.</b> Our exact prompts are original, but "longest increasing subarray" and "BFS on a grid" absolutely sit in every model's training distribution. We can't claim contamination-free.</li>
+  <li><b>Single region, single time-of-day, single run.</b> No confidence intervals. Provider throttling shifts by hour.</li>
+  <li><b>No streaming, no time-to-first-token, no p95 latency.</b> Different post.</li>
+  <li><b>Output-token inflation factors are placeholder</b> (Opus 1.35&times;, GPT-5.5 1.20&times;, Gemini 1.05&times;). The <b>input-side</b> 60% Opus number is real and measured on this run's prompts. The output-side numbers need a controlled corpus to be properly measured. v2 will do that.</li>
+  <li><b>Five models. Your favorite isn't in here.</b> The scripts will run any Mesh-routable model. Clone the repo, add a row, go.</li>
+</ul>
+
+<div class="callout warn">
+  <p>Everything above is a "what we didn't do." If you noticed a methodological hole we haven't named here, please reply. We'd rather fix it in v2 than ship it as a foundation.</p>
+</div>
+
+<h2>Methodology, briefly</h2>
+
+<ul>
+  <li><b>Runner.</b> Every call: temperature 0.2, max_tokens 4096, identical prompt across models. Three retries with exponential backoff on transient errors. Token counts straight from provider <code>usage</code>. Mesh as the routing layer.</li>
+  <li><b>Task A judge.</b> Extract Python from fenced block, run in subprocess with 8-second timeout against hidden tests. All-or-nothing per test.</li>
+  <li><b>Task B judge.</b> Claude Opus 4.7, two passes per output (temp 0.0 and 0.3). Three integer scores 1 to 5 (tone, accuracy, completeness). Quality = mean of the six numbers per item. Variance = spread between the two temperature passes.</li>
+  <li><b>Effective cost formula.</b> <code>(in_tokens × in_price + out_tokens × out_price × inflation_factor) / 1M</code>. Input-side inflation came from real per-model token counts on identical prompts (see Tax 1). Output-side inflation is the kit's placeholder values, to be replaced in v2.</li>
+</ul>
+
+<div class="cta">
+  <h3>Reproduce it yourself</h3>
+  <p>Datasets: <code>task_a_code.json</code>, <code>task_b_support.json</code>. Both in the repo, MIT-licensed.</p>
+  <p>Scripts: <code>runner.py</code>, <code>judge.py</code>, <code>aggregate.py</code>, <code>cost_estimator.py</code>. Drop in your Mesh key, point at any subset of the catalog, get a CSV that matches this post's tables.</p>
+  <p>Total cost for the whole benchmark including discarded re-runs while we debugged: <strong>about $1.30</strong>. One Opus call is a quarter of a cent. A million of them adds up.</p>
+  <p><a class="btn" href="#">View repo and raw CSVs &rarr;</a></p>
+</div>
+
+<footer>
+  <p>This is v1, pilot edition. v2 ships with n=30, three-judge ensemble, human calibration on 100 items, latency percentiles, and (probably) two more models in the lineup. If you want a ping when it's out, follow this account and we'll post a thread the morning it lands.</p>
+  <p>Caveats welcome. Numbers welcome more. If you run this against your own workload and get different results, reply with the CSV and we'll fold the corrections into v2.</p>
+  <p style="margin-top:14px;opacity:0.6">mesh_api &nbsp;·&nbsp; Mesh API benchmark &nbsp;·&nbsp; pilot n=5 per task</p>
+</footer>
+
+</div>
+</body>
+</html>

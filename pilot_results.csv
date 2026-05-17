@@ -1,0 +1,11 @@
+task,model,n_calls,n_errors,total_input_tokens,total_output_tokens,tokenizer_inflation,raw_cost_usd,effective_cost_usd,retry_overhead_pct,avg_latency_ms,pass_rate,n_correct,cost_per_task_usd,cost_per_correct_usd,quality_score,quality_variance,cost_per_quality_usd
+task_a,GPT-4o-mini,5,0,468,686,1.0,0.0005,0.0005,0.0,2438.0,1.0,5,0.0001,0.0001,,,
+task_a,DeepSeek V4 Pro,5,0,455,3390,1.0,0.0101,0.0101,0.0,28405.0,1.0,5,0.00201,0.00201,,,
+task_a,Claude Opus 4.7,5,0,699,878,1.35,0.0216,0.0282,0.0,3906.0,1.0,5,0.00563,0.00563,,,
+task_a,GPT-5.5,5,0,463,1129,1.2,0.0362,0.043,0.0,5540.0,1.0,5,0.00859,0.00859,,,
+task_a,Gemini 2.5 Pro,5,0,452,19165,1.05,0.1922,0.2018,0.0,27967.0,0.4,2,0.04036,0.1009,,,
+task_b_support,GPT-4o-mini,5,0,1076,692,1.0,0.0006,0.0006,0.0,2324,,,0.00012,,3.033,0.067,0.00019
+task_b_support,DeepSeek V4 Pro,5,0,1127,2987,1.0,0.0099,0.0099,0.0,16220.0,,,0.00198,,3.067,0.133,0.00322
+task_b_support,Claude Opus 4.7,5,0,1769,1417,1.35,0.0376,0.0482,0.0,7067.0,,,0.00963,,3.533,0.0,0.01363
+task_b_support,GPT-5.5,5,0,1071,1570,1.2,0.0525,0.0619,0.0,9162,,,0.01238,,3.333,0.133,0.01856
+task_b_support,Gemini 2.5 Pro,5,0,1185,6758,1.05,0.0691,0.0724,0.0,13744.0,,,0.01449,,3.167,0.2,0.02288
