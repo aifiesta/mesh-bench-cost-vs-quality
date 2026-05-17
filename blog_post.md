@@ -224,7 +224,7 @@ In service of honesty, here's everything we *didn't* cover. Hold us to all of th
 - Scripts: `runner.py`, `judge.py`, `aggregate.py`, `cost_estimator.py`, drop in your Mesh key, point at any subset of the catalog, get a CSV that matches this post's tables.
 - Total cost for the whole benchmark including discarded re-runs while we debugged: **about $1.30**. One Opus call is a quarter of a cent. A million of them adds up.
 
-**Repo + raw CSVs + this post's tables: `<<link>>`**
+**Repo + raw CSVs + this post's tables: [github.com/aifiesta/mesh-bench-cost-vs-quality](https://github.com/aifiesta/mesh-bench-cost-vs-quality)**
 
 ---
 
