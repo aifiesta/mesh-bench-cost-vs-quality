@@ -2,9 +2,13 @@
 
 A small, sharp, fully reproducible benchmark across five LLMs on two real workloads. Code generation and customer support. Every call routed through [Mesh API](https://meshapi.ai) so the runner, rate-limiting, and billing are identical across providers.
 
-This is the first in a series of benchmark repos under [aifiesta](https://github.com/aifiesta). Each repo in the series is a single, self-contained question (one dataset, one methodology, one blog post). The umbrella index is at [aifiesta/mesh-benchmarks](https://github.com/aifiesta/mesh-benchmarks).
+## The tasks
 
-## Headline result, pilot edition (n=5 per task)
+**Task A: code generation.** 30 original algorithmic problems, medium difficulty, written from scratch to limit training-set contamination (the *exact* problem strings aren't on the internet, though the *patterns* obviously are). Each problem ships hidden test cases (4 to 5 per problem). The model receives a prompt with a function signature like `def solve(nums: list[int]) -> int` plus a short natural-language description, and must return one complete Python function inside a fenced code block. The judge extracts the function, runs it in a subprocess against the hidden tests with an 8-second timeout, and scores it pass/fail per test. The pilot uses the first 5 problems (A01 to A05): longest strictly increasing subarray, longest substring with at most 2 distinct characters, integers up to N that have no prime factor greater than 5, count of connected groups of 1s in a binary grid, count of subarrays whose sum equals k. Classic patterns (sliding window, prefix sum, BFS, factorization) but with original phrasings and input shapes.
+
+**Task B: customer support.** 30 synthetic tickets for a fictional cloud-storage product called *Nimbus* with three plans (Personal $9/mo, Pro $20/mo, Team $50/mo) and a small set of known policies (refund window, plan-gated features, account recovery, SLA tiers). Each ticket ships per-item rubric notes that tell the LLM judge what a correct reply should do, what it must not invent, and where ambiguity belongs. Categories include straightforward refunds, refund edge cases (charge outside policy window), account recovery, technical errors, billing math, feature questions gated by plan tier, angry user de-escalation, outage SLA disputes, data export, security incidents, feature requests, neutral product comparisons, and explicit "policy is silent on this" edge cases. The model writes one reply per ticket. Claude Opus 4.7 rates each reply twice (temperature 0.0 and 0.3) on tone, accuracy, and completeness (1 to 5 integer scores).
+
+## Pilot results, n=5 per task
 
 | Model | Task A pass | Task A $/correct | Task B quality (1 to 5) | Task B $/qual-pt |
 | --- | --- | --- | --- | --- |
@@ -14,7 +18,7 @@ This is the first in a series of benchmark repos under [aifiesta](https://github
 | GPT-5.5 | 5/5 | $0.00859 | 3.33 ± 0.13 | $0.01856 |
 | Gemini 2.5 Pro | 2/5 | $0.10090 | 3.17 ± 0.20 | $0.02288 |
 
-Four of five models tied at 100% on the code test. The cheapest one came out 86x cheaper than GPT-5.5 per correct answer. Claude Opus 4.7's tokenizer billed roughly 60% more input tokens than OpenAI's for the same English text. Gemini 2.5 Pro billed roughly 96% of its output as hidden reasoning that never reached the response body. Full write-up: see `blog_post.html`.
+**What we found, in one paragraph.** GPT-4o-mini ($0.15/M input) won both axes. It got 5/5 on the code test and posted a customer-support quality score (3.03) within 14% of the most expensive model in the lineup, while costing 86x less per correct code answer than GPT-5.5 and 72x less per quality-point on support than Claude Opus 4.7. Four of five models tied at perfect on the code test, so the premium tiers bought no accuracy at this size, just higher bills. Claude Opus 4.7 led customer-support quality at 3.53 with a perfectly stable judge score (variance 0.00 across two passes), but the 0.5-point lead over the cheapest model cost roughly 72x more per quality-point. Gemini 2.5 Pro was the outlier in the wrong direction: 2/5 on the code test, and roughly 96% of its billed output tokens were hidden reasoning that never reached the response body, which made it 1,009x more expensive per correct code answer than GPT-4o-mini. On the input side, Claude Opus 4.7's tokenizer reported 60% more tokens than OpenAI's for the exact same English prompts, which means its effective input price on this corpus is closer to $8/M than the $5/M on the price card. Full write-up with charts and methodology: see `blog_post.html`.
 
 > Pilot, n=5/task. Headline gaps are big enough that the broad shape is unlikely to flip, but second-decimal differences absolutely could. Run the scripts yourself; if you get different numbers, open an issue.
 
@@ -104,7 +108,6 @@ MIT. Datasets and scripts are free to use, modify, and republish. Attribution ap
 ## Roadmap
 
 - v1: n=30 per task, three-judge ensemble, human calibration on 100 items, latency percentiles, two more models in the lineup. Will replace this README's headline table when it lands.
-- Future benchmarks in the series: see [aifiesta/mesh-benchmarks](https://github.com/aifiesta/mesh-benchmarks).
 
 ## Contributing
 
