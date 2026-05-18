@@ -18,9 +18,9 @@ GPT-4o-mini ($0.15/M input) and GPT-5.5 ($5/M input) both got 5 of 5. Same answe
 
 A $5/M-input model is really charging ~$8/M-input on the text we sent. That hidden tax is not on Anthropic's price page.
 
-**3. Gemini 2.5 Pro billed 19,165 "output tokens" across 5 code problems.**
+**3. Gemini 2.5 Pro billed roughly 23x more output tokens than what actually showed up in the response.**
 
-Visible answer content: ~840 tokens. Roughly **96% hidden reasoning** that the API strips before the response reaches you. And the model still only got 2 of 5 problems right.
+Across 5 code problems Gemini's invoice counted ~19,000 output tokens. The visible answer content totaled ~840 tokens. The other ~18,000 are hidden reasoning the API strips before the response reaches you, so you pay for 23x what you can see. And the model still only got 2 of 5 problems right.
 
 **4. On customer support, the best model (Opus 4.7) was 14% higher quality than the cheapest (GPT-4o-mini), and 72x more expensive per quality-point.**
 
@@ -80,7 +80,7 @@ Your number will differ. Code-heavy traffic, multilingual, structured data, ever
 
 Some models "think" silently before they answer. Those reasoning tokens are real tokens, on your bill, even though you can't see them in the response.
 
-Gemini 2.5 Pro is the worst case we measured: **19,165 billed output tokens across 5 code problems, ~840 tokens of visible answer.** That's ~96% you paid for and never saw. The model still got 2 of 5 right. A single Gemini call on Task A cost ~$0.04 vs ~$0.0001 for GPT-4o-mini. **400x more expensive, two-fifths the accuracy.**
+Gemini 2.5 Pro is the worst case we measured. **Across 5 code problems it billed ~23x more output tokens than what actually appeared in the response.** ~19,000 billed, ~840 visible. That's ~96% paid for and never seen. The model still got 2 of 5 right. A single Gemini call on Task A cost ~$0.04 vs ~$0.0001 for GPT-4o-mini. **400x more expensive, two-fifths the accuracy.**
 
 GPT-5.5 also does internal reasoning (visibly less than Gemini, but it's there): 226 output tokens per Task A item vs 137 for GPT-4o-mini. That's 65% more billed output for similar-length final answers.
 
@@ -111,6 +111,8 @@ The decision rule isn't "use the best model." It's **route the call by what it a
 ---
 
 ## Latency, while we're at it
+
+These are **end-to-end wall-clock numbers**, request to response. They include our network round-trip, Mesh's routing overhead, and the upstream provider's inference. Not isolated model service time.
 
 | Model | Code task avg | Support task avg |
 | --- | --- | --- |

@@ -20,7 +20,7 @@ This is a pilot (n=5/task). v1 with n=30 is coming. The headline gaps are big en
 
 2. **Claude Opus 4.7's tokenizer billed us ~60% more input tokens than OpenAI's for the same English prompts.** A $5/M-input model is really charging ~$8/M-input on the text we sent. That hidden tax is not on Anthropic's price page.
 
-3. **Gemini 2.5 Pro billed 19,165 "output tokens" across 5 code problems. Visible answer content: ~840 tokens.** That's **~96% hidden reasoning that Mesh strips before the response reaches you**, and the model still only got 2 of 5 problems right.
+3. **Gemini 2.5 Pro billed roughly 23x more output tokens than what actually appeared in its responses.** Across 5 code problems Gemini's invoice counted ~19,000 output tokens. The visible answer content totaled ~840 tokens. The other ~18,000 are hidden reasoning the API strips before the response reaches you. The model still only got 2 of 5 problems right.
 
 4. **On support, the best model (Opus 4.7) was 14% higher quality than the cheapest (GPT-4o-mini), and 72× more expensive per quality-point.** A small quality bump that costs a fortune.
 
@@ -103,9 +103,9 @@ Some models "think" silently before they answer. Those reasoning tokens are real
 
 **Gemini 2.5 Pro is the worst case we measured:**
 
-- Output tokens billed across 5 code problems: **19,165**
+- Output tokens billed across 5 code problems: **~19,000**
 - Visible answer content total: ~3,400 characters, roughly **~840 tokens**
-- **~96% of what we paid for never reached the response body.**
+- That's **roughly 23x more output tokens billed than actually appeared in the response.** ~96% paid for, never seen.
 
 A single Gemini call on Task A cost ~$0.04. The equivalent GPT-4o-mini call cost ~$0.0001. **400× more expensive, and Gemini got 2 of 5 right vs. GPT-4o-mini's 5 of 5.**
 
@@ -145,7 +145,7 @@ Opus 4.7 buys a small quality bump for a huge cost bump. That can be worth it on
 
 ## Latency, while we're at it
 
-Cost isn't the only axis. On the same calls:
+These are **end-to-end wall-clock numbers**, request to response. They include our network round-trip, Mesh's routing overhead, and the upstream provider's inference. Not isolated model service time. Cost isn't the only axis:
 
 | Model | Task A avg | Task B avg |
 | --- | --- | --- |

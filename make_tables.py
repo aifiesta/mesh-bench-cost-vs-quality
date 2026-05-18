@@ -12,7 +12,8 @@ import matplotlib.patches as patches
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 OUT_DIR = Path(__file__).parent
-LOGO_PATH = Path("/Users/raushan/Documents/Career/AiFiesta/MeshAPI/marketing/Branding/mesh_api_logo_v2/mesh_api_logo_icon.png")
+# Full lockup mesh_api logo (cropped from mesh_api_logo_main_dark_theme.svg).
+LOGO_PATH = OUT_DIR / "_assets_mesh_api_logo.png"
 
 # Palette matches make_charts.py
 BG = "#0E1126"
@@ -45,8 +46,9 @@ def add_title(fig, title, subtitle=None):
 
 
 def add_footer(fig, text="Mesh API benchmark  ·  pilot n=5 per task  ·  github.com/aifiesta/mesh-bench-cost-vs-quality"):
-    foot_y = 0.012
-    foot_h = 0.05
+    """Bottom-center footer: full mesh_api logo + separator + caption."""
+    foot_y = 0.005
+    foot_h = 0.110
     foot_ax = fig.add_axes([0.0, foot_y, 1.0, foot_h], frameon=False)
     foot_ax.set_xlim(0, 1); foot_ax.set_ylim(0, 1)
     foot_ax.set_xticks([]); foot_ax.set_yticks([])
@@ -60,30 +62,26 @@ def add_footer(fig, text="Mesh API benchmark  ·  pilot n=5 per task  ·  github
             fig_w_in, fig_h_in = fig.get_size_inches()
             ax_w_in = fig_w_in
             ax_h_in = fig_h_in * foot_h
-            icon_h_in = 0.7 * ax_h_in
-            icon_w_in = icon_h_in * iw / ih
-            icon_w = icon_w_in / ax_w_in
-            wordmark_w = 0.060
+            logo_h_in = 0.95 * ax_h_in
+            logo_w_in = logo_h_in * iw / ih
+            logo_w = logo_w_in / ax_w_in
+            logo_h = 0.95
             sep_w = 0.010
-            caption_w = 0.62
-            gap = 0.008
-            total = icon_w + gap + wordmark_w + sep_w + caption_w
+            caption_w = 0.60
+            gap = 0.014
+            total = logo_w + gap + sep_w + caption_w
             x = (1 - total) / 2
-            foot_ax.imshow(img, extent=(x, x + icon_w, 0.15, 0.85),
+            foot_ax.imshow(img, extent=(x, x + logo_w, (1 - logo_h)/2, (1 + logo_h)/2),
                            aspect="auto", interpolation="lanczos", zorder=2)
-            cx = x + icon_w + gap
-            foot_ax.text(cx, 0.5, "mesh_api", color=TEXT, fontsize=11,
-                         fontweight="bold", ha="left", va="center")
-            cx += wordmark_w
-            foot_ax.text(cx, 0.5, "·", color=MUTED, fontsize=11, ha="left", va="center")
+            cx = x + logo_w + gap
+            foot_ax.text(cx, 0.5, "·", color=MUTED, fontsize=12, ha="left", va="center")
             cx += sep_w
-            foot_ax.text(cx, 0.5, text, color=MUTED, fontsize=9, ha="left", va="center")
+            foot_ax.text(cx, 0.5, text, color=MUTED, fontsize=10, ha="left", va="center")
             placed = True
         except Exception:
             pass
     if not placed:
-        foot_ax.text(0.5, 0.5, f"mesh_api  ·  {text}", color=MUTED,
-                     fontsize=9, ha="center", va="center")
+        foot_ax.text(0.5, 0.5, text, color=MUTED, fontsize=9, ha="center", va="center")
 
 
 def draw_table(fig, ax, headers, rows, col_aligns=None, col_widths=None,
@@ -213,7 +211,7 @@ def table_1_pricing():
                col_aligns=["left", "left", "left", "right", "right"],
                col_widths=[0.26, 0.18, 0.16, 0.20, 0.20])
     add_footer(fig)
-    fig.savefig(OUT_DIR / "table_1_pricing.png", dpi=144, bbox_inches="tight", facecolor=BG)
+    fig.savefig(OUT_DIR / "table_1_pricing.png", dpi=144, bbox_inches="tight", pad_inches=0.5, facecolor=BG)
     plt.close(fig)
 
 
@@ -254,7 +252,7 @@ def table_2_headline():
                highlight_rows={0},
                color_cells=color_cells)
     add_footer(fig)
-    fig.savefig(OUT_DIR / "table_2_headline.png", dpi=144, bbox_inches="tight", facecolor=BG)
+    fig.savefig(OUT_DIR / "table_2_headline.png", dpi=144, bbox_inches="tight", pad_inches=0.5, facecolor=BG)
     plt.close(fig)
 
 
@@ -281,7 +279,7 @@ def table_3_tokenizer():
                highlight_rows=set(),  # don't mark a winner; outlier is the story
                color_cells=color_cells)
     add_footer(fig)
-    fig.savefig(OUT_DIR / "table_3_tokenizer.png", dpi=144, bbox_inches="tight", facecolor=BG)
+    fig.savefig(OUT_DIR / "table_3_tokenizer.png", dpi=144, bbox_inches="tight", pad_inches=0.5, facecolor=BG)
     plt.close(fig)
 
 
@@ -317,7 +315,7 @@ def table_4_cost_ratios():
                highlight_rows={0},
                color_cells=color_cells)
     add_footer(fig)
-    fig.savefig(OUT_DIR / "table_4_cost_ratios.png", dpi=144, bbox_inches="tight", facecolor=BG)
+    fig.savefig(OUT_DIR / "table_4_cost_ratios.png", dpi=144, bbox_inches="tight", pad_inches=0.5, facecolor=BG)
     plt.close(fig)
 
 
@@ -348,7 +346,7 @@ def table_5_latency():
                highlight_rows={0},
                color_cells=color_cells)
     add_footer(fig)
-    fig.savefig(OUT_DIR / "table_5_latency.png", dpi=144, bbox_inches="tight", facecolor=BG)
+    fig.savefig(OUT_DIR / "table_5_latency.png", dpi=144, bbox_inches="tight", pad_inches=0.5, facecolor=BG)
     plt.close(fig)
 
 

@@ -8,7 +8,9 @@ from matplotlib.patches import FancyBboxPatch
 from pathlib import Path
 
 OUT_DIR = Path(__file__).parent
-LOGO_PATH = Path("/Users/raushan/Documents/Career/AiFiesta/MeshAPI/marketing/Branding/mesh_api_logo_v2/mesh_api_logo_icon.png")
+# Pre-rendered mesh_api logo (the full lockup, dark-theme version).
+# Source: mesh_api_logo_main_dark_theme.svg, rendered at 1600px and tight-cropped.
+LOGO_PATH = OUT_DIR / "_assets_mesh_api_logo.png"
 
 # Palette inspired by reference screenshot (dark navy bg, violet + orange bars)
 BG = "#0E1126"
@@ -159,67 +161,47 @@ def add_title(fig, title, subtitle=None):
 
 
 def add_footer(fig, text="Mesh API benchmark  ·  pilot n=5 per task"):
-    """Bottom-center footer: Mesh icon + 'mesh_api' wordmark + separator + caption.
+    """Bottom-center footer: full mesh_api logo (lockup) + separator + caption.
 
-    Uses an inset axes spanning the figure width at the very bottom so the
-    icon and text always sit on the same baseline, regardless of figure size.
+    The logo already includes the 'mesh_api' wordmark, so we don't draw a
+    separate wordmark; we just place the logo image and the caption text
+    side by side on the same baseline.
     """
-    # Figure-coordinate bounding box for the footer strip
-    foot_y = 0.012
-    foot_h = 0.05
+    foot_y = 0.005
+    foot_h = 0.110
     foot_ax = fig.add_axes([0.0, foot_y, 1.0, foot_h], frameon=False)
-    foot_ax.set_xlim(0, 1)
-    foot_ax.set_ylim(0, 1)
+    foot_ax.set_xlim(0, 1); foot_ax.set_ylim(0, 1)
     foot_ax.set_xticks([]); foot_ax.set_yticks([])
     for s in foot_ax.spines.values(): s.set_visible(False)
-    foot_ax.set_facecolor("none")
     foot_ax.patch.set_alpha(0)
 
-    # Compose the centered footer line:
-    # [icon]  mesh_api   ·   {caption text}
-    placed_logo = False
+    placed = False
     if LOGO_PATH.exists():
         try:
             img = mpimg.imread(str(LOGO_PATH))
-            # Icon aspect: 48x58 (w x h)
-            # Place inside foot_ax with imshow. extent in foot_ax coords.
-            # We want the icon to occupy ~70% of foot_h vertically.
-            icon_h_frac = 0.7
             ih, iw = img.shape[0], img.shape[1]
-            # Compute icon width in foot_ax coords given fig aspect:
             fig_w_in, fig_h_in = fig.get_size_inches()
-            # foot_ax is 1.0 wide in fig-coord-x (so its width in inches = fig_w_in).
-            # foot_ax is foot_h tall in fig-coord-y (so its height in inches = fig_h_in*foot_h).
             ax_w_in = fig_w_in
             ax_h_in = fig_h_in * foot_h
-            # icon height in inches = icon_h_frac * ax_h_in
-            icon_h_in = icon_h_frac * ax_h_in
-            icon_w_in = icon_h_in * iw / ih
-            # icon width in axes coords:
-            icon_w = icon_w_in / ax_w_in
-            icon_h = icon_h_frac
-            # Center the composite "[icon] mesh_api · caption" horizontally.
-            # Text widths estimated; refined empirically.
-            wordmark_w = 0.080   # axes-x fraction for "mesh_api" at fontsize 10
-            sep_w = 0.012
-            caption_w = 0.20     # approx
-            gap = 0.010
-            total = icon_w + gap + wordmark_w + sep_w + caption_w
+            logo_h_in = 0.95 * ax_h_in
+            logo_w_in = logo_h_in * iw / ih
+            logo_w = logo_w_in / ax_w_in
+            logo_h = 0.95
+            sep_w = 0.010
+            caption_w = 0.22
+            gap = 0.014
+            total = logo_w + gap + sep_w + caption_w
             x = (1 - total) / 2
-            # Place icon
-            foot_ax.imshow(img, extent=(x, x + icon_w, (1 - icon_h)/2, (1 + icon_h)/2),
+            foot_ax.imshow(img, extent=(x, x + logo_w, (1 - logo_h)/2, (1 + logo_h)/2),
                            aspect="auto", interpolation="lanczos", zorder=2)
-            cx = x + icon_w + gap
-            foot_ax.text(cx, 0.5, "mesh_api", color=TEXT, fontsize=10.5,
-                         fontweight="bold", ha="left", va="center")
-            cx += wordmark_w
-            foot_ax.text(cx, 0.5, "·", color=SUBTEXT, fontsize=10, ha="left", va="center")
+            cx = x + logo_w + gap
+            foot_ax.text(cx, 0.5, "·", color=SUBTEXT, fontsize=12, ha="left", va="center")
             cx += sep_w
-            foot_ax.text(cx, 0.5, text, color=SUBTEXT, fontsize=9, ha="left", va="center")
-            placed_logo = True
+            foot_ax.text(cx, 0.5, text, color=SUBTEXT, fontsize=10, ha="left", va="center")
+            placed = True
         except Exception:
             pass
-    if not placed_logo:
+    if not placed:
         foot_ax.text(0.5, 0.5, f"mesh_api  ·  {text}", color=SUBTEXT,
                      fontsize=9, ha="center", va="center")
 
@@ -229,8 +211,8 @@ def add_footer(fig, text="Mesh API benchmark  ·  pilot n=5 per task"):
 # Single-metric headline chart, but with pass-rate annotation.
 # =============================================================================
 def chart_1():
-    fig, ax = plt.subplots(figsize=(12, 6.8))
-    fig.subplots_adjust(top=0.85, bottom=0.24, left=0.08, right=0.95)
+    fig, ax = plt.subplots(figsize=(12, 7.4))
+    fig.subplots_adjust(top=0.85, bottom=0.30, left=0.08, right=0.95)
     add_title(fig, "Chart 1: Real cost per correct code answer",
               "Five models, five identical algorithmic problems. Lower bar wins. Log scale.")
 
@@ -260,7 +242,7 @@ def chart_1():
     extras = [f"{p:.0f}% pass" for p in pass_rates]
     model_labels(ax, models, colors, y_below=-0.10, extras=extras)
     add_footer(fig)
-    plt.savefig(OUT_DIR / "chart_1_real_cost.png", dpi=144, bbox_inches="tight",
+    plt.savefig(OUT_DIR / "chart_1_real_cost.png", dpi=144, bbox_inches="tight", pad_inches=0.5,
                 facecolor=BG)
     plt.close()
 
@@ -269,8 +251,8 @@ def chart_1():
 # Chart 2: Task A scoreboard. Two bars per model (pass rate + $/correct).
 # =============================================================================
 def chart_2():
-    fig, ax = plt.subplots(figsize=(12, 6.8))
-    fig.subplots_adjust(top=0.83, bottom=0.24, left=0.08, right=0.92)
+    fig, ax = plt.subplots(figsize=(12, 7.2))
+    fig.subplots_adjust(top=0.83, bottom=0.27, left=0.08, right=0.92)
     add_title(fig, "Chart 2: Task A scoreboard. Pass rate and $/correct.",
               "Five original code problems. Score is % of test cases passed (left). Cost is dollars per correct solution (right, log).")
 
@@ -319,7 +301,7 @@ def chart_2():
     pill_legend(ax, [("Pass rate, %", VIOLET), ("$/correct, log", ORANGE)], y=1.04)
     model_labels(ax, models, [ACCENT[m] for m in models], y_below=-0.10)
     add_footer(fig)
-    plt.savefig(OUT_DIR / "chart_2_task_a.png", dpi=144, bbox_inches="tight",
+    plt.savefig(OUT_DIR / "chart_2_task_a.png", dpi=144, bbox_inches="tight", pad_inches=0.5,
                 facecolor=BG)
     plt.close()
 
@@ -328,8 +310,8 @@ def chart_2():
 # Chart 3: Task B scoreboard. Two bars per model (quality + $/qual-pt).
 # =============================================================================
 def chart_3():
-    fig, ax = plt.subplots(figsize=(12, 6.8))
-    fig.subplots_adjust(top=0.83, bottom=0.24, left=0.08, right=0.92)
+    fig, ax = plt.subplots(figsize=(12, 7.2))
+    fig.subplots_adjust(top=0.83, bottom=0.27, left=0.08, right=0.92)
     add_title(fig, "Chart 3: Task B scoreboard. Quality and $/quality-point.",
               "Five customer-support tickets. Quality is the LLM judge mean (1 to 5, error bars span temp 0.0 and 0.3). Cost is dollars per quality-point.")
 
@@ -372,7 +354,7 @@ def chart_3():
     pill_legend(ax, [("Quality, 1 to 5", VIOLET), ("$/qual-pt, log", ORANGE)], y=1.04)
     model_labels(ax, models, [ACCENT[m] for m in models], y_below=-0.10)
     add_footer(fig)
-    plt.savefig(OUT_DIR / "chart_3_task_b.png", dpi=144, bbox_inches="tight",
+    plt.savefig(OUT_DIR / "chart_3_task_b.png", dpi=144, bbox_inches="tight", pad_inches=0.5,
                 facecolor=BG)
     plt.close()
 
@@ -430,7 +412,7 @@ def chart_4():
     ax.set_xlabel("$ per quality-point across both tasks (log scale)",
                   color=SUBTEXT, fontsize=9.5)
     add_footer(fig)
-    plt.savefig(OUT_DIR / "chart_4_cross_task.png", dpi=144, bbox_inches="tight",
+    plt.savefig(OUT_DIR / "chart_4_cross_task.png", dpi=144, bbox_inches="tight", pad_inches=0.5,
                 facecolor=BG)
     plt.close()
 

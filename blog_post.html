@@ -344,7 +344,7 @@
   </div>
   <div class="card">
     <div class="num">03</div>
-    <div class="lede"><strong>Gemini 2.5 Pro billed 19,165 "output tokens" across 5 code problems.</strong> Visible answer content: ~840 tokens. Roughly <strong>96% hidden reasoning</strong> Mesh strips before the response reaches you. The model still only got 2 of 5 problems right.</div>
+    <div class="lede"><strong>Gemini 2.5 Pro billed roughly 23x more output tokens than what actually appeared in its responses.</strong> ~19,000 billed across 5 code problems, ~840 visible. The other ~18,000 are hidden reasoning the API strips before the response reaches you. The model still only got 2 of 5 right.</div>
   </div>
   <div class="card">
     <div class="num">04</div>
@@ -455,7 +455,7 @@
 
 <p><strong>Gemini 2.5 Pro is the worst case we measured:</strong></p>
 <ul>
-  <li>Output tokens billed across 5 code problems: <strong>19,165</strong></li>
+  <li>Output tokens billed across 5 code problems: <strong>~19,000</strong></li>
   <li>Visible answer content total: ~3,400 characters, roughly <strong>~840 tokens</strong></li>
   <li><strong>~96% of what we paid for never reached the response body.</strong></li>
 </ul>
@@ -513,7 +513,7 @@
 
 <h2>Latency, while we're at it</h2>
 
-<p>Cost isn't the only axis. On the same calls:</p>
+<p>These are <strong>end-to-end wall-clock numbers</strong>, request to response. They include our network round-trip, Mesh's routing overhead, and the upstream provider's inference. Not isolated model service time. Cost isn't the only axis:</p>
 
 <div class="table-wrap">
 <table>
